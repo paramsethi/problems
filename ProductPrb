@@ -1,0 +1,148 @@
+package com.param.prbs;
+
+import org.junit.Assert;
+import org.junit.Test;
+
+/**
+ * Problem: Find product of all N-1 element permutations in the given integer
+ * array.
+ * 
+ * Will generate n!/(n-r)! permutations
+ * 
+ * As r = n-1 in this case
+ * 
+ * => (n*(n-1)*(n-2)*....*1)/(n-1)*(n-2)*....*1 = n
+ * 
+ * 
+ * @author parseth
+ * 
+ */
+public class ProductPrb {
+
+	/**************************************** Test Code ***************************/
+
+	@Test
+	public void testCalculateProduct() {
+		int[] data = { 3, 1, 2 };
+		int[] actual = calculateProduct(data);
+		int[] expected = { 2, 6, 3 };
+		Assert.assertArrayEquals(actual, expected);
+	}
+
+	@Test
+	public void testCalculateProductFaster() {
+		int[] data = { 3, 1, 2 };
+		int[] actual = calculateProductFaster(data);
+		int[] expected = { 2, 6, 3 };
+		Assert.assertArrayEquals(actual, expected);
+	}
+
+	@Test
+	public void testCalculateProduct2() {
+		int[] data = { 1, 3, 5, 2 };
+		int[] actual = calculateProduct(data);
+		int[] expected = { 30, 10, 6, 15 };
+		Assert.assertArrayEquals(actual, expected);
+	}
+
+	@Test
+	public void testCalculateProductFaster2() {
+		int[] data = { 1, 3, 5, 2 };
+		int[] actual = calculateProductFaster(data);
+		int[] expected = { 30, 10, 6, 15 };
+		Assert.assertArrayEquals(actual, expected);
+	}
+
+	/**************************************** Implementation **********************/
+	/**
+	 * Original solution
+	 * 
+	 * Time Complexity - O(2n) (Two for loops on the array) Space Complexity -
+	 * O(n) (For storing products array, no extra memory used.)
+	 * 
+	 * Algo: Calculate product from 0 to i-1 And then calculate product from i+1
+	 * to n
+	 * 
+	 * @param a
+	 * @return
+	 */
+	public int[] calculateProduct(int[] a) {
+		long startTime = System.currentTimeMillis();
+		if (a == null || a.length <= 0) {
+			return null; // error condition check
+		}
+
+		int[] product = new int[a.length];
+
+		int tmp = 1;
+
+		// 0 to i-1 product calculation
+		for (int i = 0; i < a.length; i++) {
+			product[i] = tmp;
+			tmp = tmp * a[i];
+		}
+
+		// reset for back product
+		tmp = 1;
+
+		for (int i = a.length - 1; i >= 0; i--) {
+			product[i] = product[i] * tmp;
+			tmp = tmp * a[i];
+		}
+
+		System.out.println("Total time taken for O(2n) algo: "
+				+ (System.currentTimeMillis() - startTime));
+
+		return product;
+	}
+
+	/**
+	 * O(n) solution
+	 * 
+	 * @param a
+	 * @return
+	 */
+	public int[] calculateProductFaster(int[] a) {
+		long startTime = System.currentTimeMillis();
+		if (a == null || a.length <= 0) {
+			return null;
+		}
+		int[] product = new int[a.length];
+
+		calculateProductFasterHelper(a, 1, 0, product);
+
+		System.out.println("Total time taken for O(n) algo: "
+				+ (System.currentTimeMillis() - startTime));
+
+		return product;
+	}
+
+	/**
+	 * Recursive O(n) approach with extra memory
+	 * 
+	 * Time Complexity - O(n)
+	 * 
+	 * Space Complexity - O(n) for Stack and O(n) for output Product
+	 * 
+	 * @param a
+	 * @return
+	 */
+	private int calculateProductFasterHelper(int[] a, int nxtProduct,
+			int currIndex, int[] product) {
+		int prevProduct = 1;
+
+		// base case - whole array is consumed.
+		if (currIndex >= a.length) {
+			return prevProduct;
+		}
+
+		// 0 to i-1 product calculation
+		prevProduct = calculateProductFasterHelper(a,
+				nxtProduct * a[currIndex], currIndex + 1, product);
+		int cur = a[currIndex];
+
+		product[currIndex] = nxtProduct * prevProduct;
+		prevProduct *= cur;
+		return prevProduct;
+	}
+}
